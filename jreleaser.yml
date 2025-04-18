@@ -1,0 +1,61 @@
+matrix:
+  rows:
+    - { os: macos,   arch: aarch64, ext: '',     platform: osx-aarch_64     }
+    - { os: macos,   arch: x86_64,  ext: '',     platform: osx-x86_64       }
+    - { os: linux,   arch: aarch64, ext: '',     platform: linux-aarch_64   }
+    - { os: linux,   arch: x86_64,  ext: '',     platform: linux-x86_64     }
+    - { os: windows, arch: aarch64, ext: '.exe', platform: windows-aarch_64 }
+    - { os: windows, arch: x86_64,  ext: '.exe', platform: windows-x86_64   }
+
+hooks:
+  script:
+    before:
+      - run: |
+          echo "building {{ matrix.arch }}-{{ matrix.os }}"
+          mkdir -p target/{{ matrix.arch }}-{{ matrix.os }}
+          zig build-exe src/main.zig -target {{ matrix.arch }}-{{ matrix.os }} \
+          -O ReleaseSmall -femit-bin=target/{{ matrix.arch }}-{{ matrix.os }}/helloworld{{ matrix.ext }}
+        verbose: true  
+        applyDefaultMatrix: true
+        filter:
+          includes: ['assemble']
+          
+project:
+  name: helloworld
+  description: HelloWorld in Zig
+  longDescription: HelloWorld in Zig
+  links:
+    homepage: https://github.com/jreleaser/helloworld-zig-slsa
+  authors:
+    - Andres Almiray
+  license: Apache-2.0
+  inceptionYear: 2024
+  stereotype: CLI
+
+release:
+  github:
+    overwrite: true
+    changelog:
+      formatted: ALWAYS
+      preset: conventional-commits
+      contributors:
+        format: '- {{contributorName}}{{#contributorUsernameAsLink}} ({{.}}){{/contributorUsernameAsLink}}'
+        
+assemble:
+  archive:
+    helloworld:
+      active: ALWAYS
+      formats: [ ZIP ]
+      applyDefaultMatrix: true
+      archiveName: '{{distributionName}}-{{projectVersion}}-{{ matrix.arch }}-{{ matrix.os }}'
+      fileSets:
+        - input: 'target/{{ matrix.arch }}-{{ matrix.os }}'
+          output: 'bin'
+          includes: [ 'helloworld{.exe,}' ]
+        - input: '.'
+          includes: [ 'LICENSE' ]
+
+distributions:
+  helloworld:
+    executable:
+      windowsExtension: exe

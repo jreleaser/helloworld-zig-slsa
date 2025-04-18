@@ -1,0 +1,49 @@
+= Helloworld in Zig
+
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+This repository shows how to configure link:https://github.com/features/actions[GitHub Actions], link:https://jreleaser.org/[JReleaser], and link:https://github.com/jreleaser/jreleaser-slsa[JReleaser SLSA builder] to:
+
+ * compile a helloworld app for the followign targets:
+   ** aarch64-macos
+   ** aarch64-linux
+   ** aarch64-windows
+   ** x86_64-macos
+   ** x86_64-linux
+   ** x86_64-windows
+ * assemble zip distributions with JReleaser
+ * create rolling early-access releases with JReleaser on every push to `main` branch
+ * generate SLSA attestation upon release
+
+IMPORTANT: JReleaser requires 2 additional inputs that may be set as environment variables, `JRELEASER_PROJECT_VERSION` and `JRELEASER_GITHUB_TOKEN`. 
+More information about environment variable configuration may be found in the link:https://jreleaser.org/guide/latest/reference/environment.html[guide].
+
+## Requirements
+
+ - Zig 0.14.0 or greater.
+ - Java 11 or greater.
+ - JReleaser 1.17.0 or greater.
+
+We recommend link:https://sdkman.io/[SDKMan] to install the last two requirements.
+
+## Build
+
+Compile and assemble all Zip distributions by invoking
+
+```sh
+$ jreleaser assemble
+```
+
+You may perform a release by invoking
+
+```sh
+$ jreleaser release
+```
+
+NOTE: SLSA attestation can only be generated when running on GitHub Actions.
